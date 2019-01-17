@@ -55,8 +55,16 @@ HIVEOS_ACCESS_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXAiOiJKV1QiLCJhbGc
 Add the following line to your controller
 
 use \HiveOs;
-```
 
+...
+
+return HiveOs::coins();
+
+...
+
+return HiveOs::miners();
+
+```
 
 ## Contributing
 
