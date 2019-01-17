@@ -42,9 +42,9 @@ class HiveOsServiceProvider extends ServiceProvider
     public function register()
     {
 
-        $this->app->bind('hive-os', function() {
+        $this->app->singleton('hive-os', function() {
 
-            return new HiveOs;
+            return new HiveOs();
             
         });
     }
