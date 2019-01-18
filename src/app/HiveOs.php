@@ -863,15 +863,6 @@ class HiveOs {
         return $this->_call('GET', 'hive/exchanges', [], false);
     }
 
-
-    /**
-     * 
-     */
-    public function test()
-    {
-        echo "test".PHP_EOL;
-    }
-
 }
 
 ?>
