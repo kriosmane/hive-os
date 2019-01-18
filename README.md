@@ -8,11 +8,17 @@ Laravel package for interacting with Hive OS api
 To get the latest version of HiveOs api, simply run the code below in your project.
 
 ```
-"composer require krios-mane/hive-os"
+composer require krios-mane/hive-os
 ```
 Once Laravel HiveOs is installed, You need to register the service provider. Open up `config/app.php` and add the following to the `providers` key.
 
-* `KriosMane\HiveOs\app\Providers\HiveOsServiceProvider::class,`
+```php
+'providers' => [
+    ...
+    KriosMane\HiveOs\app\Providers\HiveOsServiceProvider::class,
+    ...
+]
+```
 
 Also, register the Facade like so:
 
@@ -50,17 +56,14 @@ HIVEOS_PASSWORD=password
 HIVEOS_ACCESS_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ91e123asdas
 ```
 
-## USING /KRIOS-MANE/HIVE-OS PACKAGE 
-```
 Add the following line to your controller
 
+```php
 use \HiveOs;
 
-...
 
 return HiveOs::coins();
 
-...
 
 return HiveOs::miners();
 
@@ -80,5 +83,5 @@ Krios Mane
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+Please see [License File](LICENSE.md) for more information.
 
