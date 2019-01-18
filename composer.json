@@ -4,7 +4,7 @@
     "keywords": ["hiveos", "laravel", "hiveos api"],
     "type": "library",
     "homepage": "https://github.com/kriosmane/hive-os",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Krios Mane",
