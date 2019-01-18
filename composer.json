@@ -1,5 +1,5 @@
 {
-    "name": "krios-mane/hive-os",
+    "name": "kriosmane/hive-os",
     "description": "Laravel package for interacting with Hive OS api",
     "keywords": ["hiveos", "laravel", "hiveos api"],
     "type": "library",
