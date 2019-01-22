@@ -15,7 +15,7 @@ Once Laravel HiveOs is installed, You need to register the service provider. Ope
 ```php
 'providers' => [
     ...
-    KriosMane\HiveOs\app\Providers\HiveOsServiceProvider::class,
+    KriosMane\HiveOs\Providers\HiveOsServiceProvider::class,
     ...
 ]
 ```
@@ -25,7 +25,7 @@ Also, register the Facade like so:
 ```php
 'aliases' => [
     ...
-    'HiveOs' => KriosMane\HiveOs\app\Facades\HiveOs::class,
+    'HiveOs' => KriosMane\HiveOs\Facades\HiveOs::class,
     ...
 ]
 ```
