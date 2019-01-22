@@ -21,7 +21,7 @@ $hiveOs = new HiveOs('ACCESS_TOKEN');
 
 ```
 #### Laravel
-Once Laravel HiveOs is installed, You need to register the service provider. Open up `config/app.php` and add the following to the `providers` key.
+First You need to register the service provider. Open up `config/app.php` and add the following to the `providers` key.
 
 ```php
 'providers' => [
@@ -43,7 +43,7 @@ Also, register the Facade like so:
 You can publish the configuration file using this command:
 
 ```bash
-php artisan vendor:publish --provider="KriosMane\HiveOs\Providers\HiveOsServiceProvider"
+php artisan vendor:publish --provider="KriosMane\HiveOs\Providers\HiveOs\ServiceProvider"
 ```
 
 A configuration-file named `hiveos.php` with default settings will be placed in your `config` directory:
@@ -67,12 +67,7 @@ Add the following line to your controller
 ```php
 use \HiveOs;
 
-
 return HiveOs::coins();
-
-
-return HiveOs::miners();
-
 ```
 
 ## Contributing
