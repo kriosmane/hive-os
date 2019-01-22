@@ -1,6 +1,8 @@
 <?php
 
-namespace KriosMane\HiveOs\app;
+namespace KriosMane\HiveOs;
+
+use KriosMane\HiveOs\HiveClient;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -27,45 +29,25 @@ class HiveOs {
     protected $access_token = '';
 
     /**
-     * 
+     * @var KriosMane\HiveOs\HiveClient
      */
-    protected $endpoint = 'https://api2.hiveos.farm/api/v2/';
+    protected $client;
 
     /**
-     * 
+     * @var KriosMane\HiveOs\HiveResponse
      */
-    protected $http_client = '';
+    protected $response;
 
     /**
-     * 
-     */
-    protected $response_code = 0;
-
-    /**
-     * 
-     */
-    protected $user_agent = '';
-
-    /**
-     * 
+     * @var boolean
      */
     protected $debug = false;
 
     /**
-     * 
+     * @var boolean
      */
     protected $verify = false;
 
-    /**
-     *  
-     */
-    const RESPONSE_OK_CODE              = 200;
-    const RESPONSE_CREATE_OK            = 201;
-    const RESPONSE_TRANSFER_OK_CODE     = 204;
-    const RESPONSE_FARM_UPDATED_OK_CODE = 204;
-    const RESPONSE_ACTION_OK            = 204;
-    const RESPONSE_DELETE_OK            = 204;
-    const FLIGHT_SHEET_USED_BY_WORKERS  = 409;
 
     /**
      * 
@@ -162,12 +144,28 @@ class HiveOs {
     }
 
     /**
+     * 
+     */
+    public function getDebug()
+    {
+        return $this->debug;
+    }
+
+    /**
      * @param boolean $boolean
      * @return void
      */
     public function setVerify($boolean)
     {
         $this->verify = $boolean;
+    }
+
+    /**
+     * 
+     */
+    public function getVerify()
+    {
+        return $this->verify;
     }
 
     /**
@@ -183,14 +181,7 @@ class HiveOs {
         
         $this->access_token = config('hiveos.access_token');
         
-        $this->endpoint     = config('hiveos.endpoint');
-
-        $this->http_client  = new Client([
-
-            'base_uri' => $this->endpoint
-        
-        ]);
-        
+        $this->client = new HiveClient($this->access_token);
 
         if( $this->access_token == '' ){
             
@@ -200,89 +191,40 @@ class HiveOs {
     }
 
     /**
-     * Make call to hive os
-     * @param string  $type 
-     * @param string  $method
-     * @param array   $params
-     * @param boolean $auth
-     * @return 
+     * Wrapper for HiveClient->request()
+     * 
+     * @param string  $method   The HTTP method for this request GET|POST|PUT|DELETE|PATCH
+     * @param string  $endpoint The API endpoint for this request
+     * @param array   $params   The parameters to send with this request
+     * @param boolean $auth     Set if needed authentication
+     *  
+     * @return KriosMane\HiveOs\HiveResponse
      */
-    public function _call($type = 'POST', $method, $params = [], $auth = true)
+    public function request($method = 'GET', $endpoint, $params = [], $auth = true)
     {
-        $headers = [];
 
-        $this->response_code = 0;
+        $this->client->setDebug($this->getDebug());
 
-        if($auth){
+        $this->client->setVerify($this->getVerify());
 
-            $headers['Authorization'] = 'Bearer '.$this->access_token;
+        $this->response =  $this->client->request($method, $endpoint, $params, $auth);
 
-            $headers['User-Agent']    = $this->user_agent;
-
-        }
-
-        try{
-
-            /**
-             *  POST calls 
-             */
-            $params_key_name = 'form_params';
-
-            if($type == 'GET'){
-
-                /**
-                 * GET calls
-                 */
-                $params_key_name = 'query';
-
-            }
-            
-            $request = $this->http_client->request($type, $method, [
-
-                'headers'        => $headers,
-
-                $params_key_name => $params,
-
-                'verify'         => $this->verify,
-
-                'debug'          => $this->debug
-                
-            ]);
-
-            $this->response_code =  $request->getStatusCode(); 
-            
-            return json_decode($request->getBody(), true);
-
-        } catch(ClientException $e) {
-
-            return json_decode($e->getResponse()->getBody(), true);
-
-        } catch(ConnectException $e){
-            
-        }
-
+        return $this->response->getDecodedBody();
     }
+
 
     /**
      *  generic call for debug purpose
-     * @param string $method
-     * @param string $type
-     * @param array $params
-     * @param boolean $auth
-     * @return HiveOsResponse
+     * @param string  $method   The HTTP method for this request GET|POST|PUT|DELETE|PATCH
+     * @param string  $endpoint The API endpoint for this request
+     * @param array   $params   The parameters to send with this request
+     * @param boolean $auth     Set if needed authentication
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function generic($method, $type = 'GET', $params = [], $auth= true)
     {
-        return $this->_call($type, $method, $params, $auth);
-    }
-
-    /**
-     * Get call response code
-     * @return integer response code
-     */
-    public function getResponseCode()
-    {
-        return $this->response_code;
+        return $this->request($type, $method, $params, $auth);
     }
 
     /**
@@ -298,11 +240,13 @@ class HiveOs {
             'password' => $this->password
         ];
 
-        $response = $this->_call('POST', 'auth/login', $params, false);
+        $response = $this->request('POST', 'auth/login', $params, false);
 
         if(!is_null($response)){
 
             $this->access_token = $response['access_token'];
+
+            $this->client->setAccessToken($this->access_token);
 
             return true;
         }
@@ -312,49 +256,55 @@ class HiveOs {
 
     /**
      * List of accessed farms
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function farms()
-    {
-        return $this->_call('GET', 'farms');
+    {   
+        return $this->request('GET', 'farms');
     }
 
     /**
      * Create new farm
+     * 
      * @param array $params
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function createFarm($params)
     {
-        return $this->_call('POST', 'farms', $params);
+        return $this->request('POST', 'farms', $params);
     }
 
     /**
      * Farm info
      * 
      * @param int $farm_id Farm ID
-     * @return Array
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getFarm($farm_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id);
+        return $this->request('GET', 'farms/'.$farm_id);
     }
 
     /**
      * Edit farm
+     * 
      * @param int $farm_id
      * @param array $params
-     * @return object
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function editFarm($farm_id, $params)
     {
-        return $this->_call('PATCH', 'farms/'.$farm_id, $params);
+        return $this->request('PATCH', 'farms/'.$farm_id, $params);
     }
 
     /**
      * Delete farm
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function deleteFarm($farm_id)
     {
@@ -363,107 +313,127 @@ class HiveOs {
 
     /**
      * Farm's statistics
+     * 
      * @param int $farm_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getFarmStats($farm_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/stats');
+        return $this->request('GET', 'farms/'.$farm_id.'/stats');
     }
 
     /**
      * Farm's metrics
+     * 
      * @param int $farm_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getFarmMetrics($farm_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/metrics');
+        return $this->request('GET', 'farms/'.$farm_id.'/metrics');
     }
 
     /**
      * Farm events
+     * 
      * @param int $farm_id Farm ID
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function events($farm_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/events');
+        return $this->request('GET', 'farms/'.$farm_id.'/events');
     }
 
     /**
      * List farm's workers
+     * 
      * @param integer $farm_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getWorkers($farm_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/workers');
+        return $this->request('GET', 'farms/'.$farm_id.'/workers');
     }
 
     /**
      * Create new worker
+     * 
      * @param int $farm_id
      * @param array $params
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function createWorker($farm_id, $params)
     {
-        return $this->_call('POST', 'farms/'.$farm_id.'/workers', $params);
+        return $this->request('POST', 'farms/'.$farm_id.'/workers', $params);
     }
 
     /**
      * Worker info
+     * 
      * @param int $farm_id
      * @param int $worker_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getWorker($farm_id, $worker_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/workers/'.$worker_id);
+        return $this->request('GET', 'farms/'.$farm_id.'/workers/'.$worker_id);
     }
 
     /**
      * Edit worker
+     * 
      * @param int $farm_id
      * @param int $worker_id
      * @param array $params
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function editWorker($farm_id, $worker_id, $params)
     {
-        return $this->_call('PATCH', 'farms/'.$farm_id.'/workers/'.$worker_id, $params);
+        return $this->request('PATCH', 'farms/'.$farm_id.'/workers/'.$worker_id, $params);
     }
 
     /**
      * Delete worker
+     * 
      * @param int $farm_id
      * @param int $worker_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function deleteWorker($farm_id, $worker_id)
     {
-        return $this->_call('DELETE', 'farms/'.$farm_id.'/workers/'.$worker_id);
+        return $this->request('DELETE', 'farms/'.$farm_id.'/workers/'.$worker_id);
     }
 
     /**
      * Extended overclocking. Allows to overlock individual GPUs of different workers in one request
+     * 
      * @param int $farm_id
      * @param array $workers
      * @param array $params
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function workersOverclocking($farm_id, $workers, $params)
     {
-        return $this->_call('POST', 'farms/'.$farm_id.'/workers/overclock', $params);
+        return $this->request('POST', 'farms/'.$farm_id.'/workers/overclock', $params);
     }
 
     /**
      * Execute command on multiple workers
+     * 
      * @param int $farm_id
      * @param array|string $workers_id
      * @param array $data
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function workersCommand($farm_id, $workers_id, $command, $data = array())
     {   
@@ -487,15 +457,17 @@ class HiveOs {
 
         );
 
-        return $this->_call('POST', 'farms/'.$farm_id.'/workers/command', $params);
+        return $this->request('POST', 'farms/'.$farm_id.'/workers/command', $params);
     }
 
     /**
      * Transfer worker to another farm
+     * 
      * @param int $farm_id
      * @param int $worker_id
      * @param int $target_farm_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function transferWorker($farm_id, $worker_id, $target_farm_id)
     {
@@ -504,15 +476,17 @@ class HiveOs {
             "target_farm_id" => $target_farm_id
         ];
 
-        return $this->_call('POST', 'farms/'.$farm_id.'/workers/'.$worker_id.'/transfer', $params);
+        return $this->request('POST', 'farms/'.$farm_id.'/workers/'.$worker_id.'/transfer', $params);
     }
 
     /**
      * Transfer multiple workers to another farm
+     * 
      * @param int $farm_id
      * @param array $workers_id
      * @param int $target_farm_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function transferWorkers($farm_id, $workers_id, $target_farm_id)
     {
@@ -525,15 +499,17 @@ class HiveOs {
 
         ];
 
-        return $this->_call('POST', 'farms/'.$farm_id.'/workers/transfer', $params);
+        return $this->request('POST', 'farms/'.$farm_id.'/workers/transfer', $params);
 
     }
 
     /**
      * Get miner log
+     * 
      * @param int $farm_id
      * @param string $workers_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      * 
      */
     public function getWorkerMinerLog($farm_id, $workers_id)
@@ -549,43 +525,49 @@ class HiveOs {
 
     /**
      * Worker's messages
+     * 
      * @param int $farm_id
-     * @param int $worker_id  
-     * @return HiveOsResponse
+     * @param int $worker_id 
+     *  
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getWorkerMessages($farm_id, $worker_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/messages');
+        return $this->request('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/messages');
     }
 
     /**
      * Worker message
+     * 
      * @param int $farm_id
      * @param int $worker_id
      * @param int $message_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getWorkerMessage($farm_id, $worker_id, $message_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/messages/'.$message_id);
+        return $this->request('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/messages/'.$message_id);
     }
 
     /**
      * Worker metrics
      * @param int $farm_id
      * @param int $worker_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getWorkerMetrics($farm_id, $worker_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/metrics');
+        return $this->request('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/metrics');
     }
 
     /**
      * Farm workers GPU LIST
      * @param int $farm_id
      * @param array $workers_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function workersGpus($farm_id, $workers_ids = array())
     {
@@ -596,14 +578,16 @@ class HiveOs {
 
         ];
 
-        return $this->_call('GET', 'farms/'.$farm_id.'/workers/gpus', $params);
+        return $this->request('GET', 'farms/'.$farm_id.'/workers/gpus', $params);
     }
 
     /**
      * Worker GPUS LIST
+     * 
      * @param int $farm_id
      * @param int $worker_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function workerGpus($farm_id, $worker_id)
     {
@@ -626,63 +610,75 @@ class HiveOs {
 
     /**
      * Returns flight sheets that belong to given farm along with flight sheets that belong to farm’s owner
+     * 
      * @param int $farm_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getFlightSheets($farm_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/fs');
+        return $this->request('GET', 'farms/'.$farm_id.'/fs');
     }
 
     /**
      * Create new flight sheet
+     * 
      * @param int $farm_id
      * @param array $params
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function createFlightSheet($farm_id, $params)
     {
-        return $this->_call('POST', 'farms/'.$farm_id.'/fs', $params);
+        return $this->request('POST', 'farms/'.$farm_id.'/fs', $params);
     }
 
     /**
      * Flight sheet info
+     * 
      * @param int $farm_id
      * @param int $fs_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getFlightSheet($farm_id, $fs_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/fs/'.$fs_id);
+        return $this->request('GET', 'farms/'.$farm_id.'/fs/'.$fs_id);
     }
 
     /**
      * Edit flight sheet
+     * 
      * @param int $farm_id
      * @param int $fs_id
      * @param array $params
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function editFlightSheet($farm_id, $fs_id, $params)
     {
-        return $this->_call('PATCH', 'farms/'.$farm_id.'/fs/'.$fs_id, $params);
+        return $this->request('PATCH', 'farms/'.$farm_id.'/fs/'.$fs_id, $params);
     }
 
     /**
      * Delete flight sheet
+     * 
      * @param int $farm_id
      * @param int $fs_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function deleteFlightSheet($farm_id, $fs_id)
     {
-        return $this->_call('DELETE', 'farms/'.$farm_id.'/fs/'.$fs_id);
+        return $this->request('DELETE', 'farms/'.$farm_id.'/fs/'.$fs_id);
     }
 
     /**
      * Farm OC list
+     * 
      * @param int $farm_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getOC($farm_id, $oc_id = '')
     {   
@@ -694,137 +690,158 @@ class HiveOs {
 
         }
 
-        return $this->_call('GET', $endpoint);
+        return $this->request('GET', $endpoint);
     }
 
     /**
      * Farm wallets list
+     * 
      * @param int $farm_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getWallets($farm_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/wallets');
+        return $this->request('GET', 'farms/'.$farm_id.'/wallets');
     }
 
     /**
      * Create new wallet
+     * 
      * @param int $farm_id
      * @param array $params
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function createWallet($farm_id, $params)
     {
-        return $this->_call('POST', 'farms/'.$farm_id.'/wallets', $params);
+        return $this->request('POST', 'farms/'.$farm_id.'/wallets', $params);
     }
 
     /**
      * Edit Wallet
+     * 
      * @param int $farm_id
      * @param int $wallet_id
      * @param array $params
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function updateWallet($farm_id, $wallet_id, $params)
     {
-        return $this->_call('PATCH', 'farms/'.$farm_id.'/wallets/'.$wallet_id, $params);
+        return $this->request('PATCH', 'farms/'.$farm_id.'/wallets/'.$wallet_id, $params);
     }
 
     /**
      * Delete wallet
+     * 
      * @param int $farm_id
      * @param int $wallet_id
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function deleteWallet($farm_id, $wallet_id)
     {
-        return $this->_call('DELETE', 'farms/'.$farm_id.'/wallets/'.$wallet_id);
+        return $this->request('DELETE', 'farms/'.$farm_id.'/wallets/'.$wallet_id);
     }
 
     /**
      * Available pools list and coins that we have in pools
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function pools()
     {
-        return $this->_call('GET', 'pools', [], false);
+        return $this->request('GET', 'pools', [], false);
     }
 
     /**
      * Pool templates
+     * 
      * @param string $pool_name
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getPoolTemplatesByName($pool_name)
     {
-        return $this->_call('GET', 'pools/by_name/'.$pool_name, [], false);
+        return $this->request('GET', 'pools/by_name/'.$pool_name, [], false);
     }
 
     /**
      * Pool templates which suit coin name
+     * 
      * @param string $coin_symbol
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getPoolTemplatesByCoin($coin_symbol)
     {
-        return $this->_call('GET', 'pools/by_coin/'.$coin_symbol, [], false);
+        return $this->request('GET', 'pools/by_coin/'.$coin_symbol, [], false);
     }
 
     /**
      * List of Hive OS versions
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function versions()
     {
-        return $this->_call('GET', 'hive/versions', [], false);
+        return $this->request('GET', 'hive/versions', [], false);
     }
 
     /**
      * Hive OS version info
+     * 
      * @param string $version
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function getVersion($version)
     {
-        return $this->_call('GET', 'hive/versions/'.$version, [], false);
+        return $this->request('GET', 'hive/versions/'.$version, [], false);
     }
 
     /**
      * List of mirror URLs
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function mirrorUrls()
     {
-        return $this->_call('GET', 'hive/mirror_urls', [], false);
+        return $this->request('GET', 'hive/mirror_urls', [], false);
     }
 
     /**
      * List of available miners
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function miners()
     {
-        return $this->_call('GET', 'hive/miners', [], false);
+        return $this->request('GET', 'hive/miners', [], false);
     }
 
     /**
      * List of available algorithms
-     * @return HiveOsResponse
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
      */
     public function algos()
-    {
-        return $this->_call('GET', 'hive/algos', [], false);
+    {   
+        return $this->request('GET', 'hive/algos', [], false);
     }
     
     /**
      * Tags list
      * Returns tags that belong to given farm along with tags that belong to farm’s owner
+     * 
      * @param int $farm_id
-     * @return HiveOsResponse
+     * 
+     * @return @return KriosMane\HiveOs\HiveResponse
      */
     public function tags($farm_id)
     {
-        return $this->_call('GET', 'farms/'.$farm_id.'/tags');
+        return $this->request('GET', 'farms/'.$farm_id.'/tags');
     }
 
     /**
@@ -836,31 +853,45 @@ class HiveOs {
      *  - algo
      *  - page
      *  - per_page (default=15, max=50)
+     * 
      * @param $array $params
-     * @return HiveOsResponse
+     * 
+     * @return @return KriosMane\HiveOs\HiveResponse
      */
     public function overclocks($params = [])
     {
         
-        return $this->_call('GET', 'hive/overclocks', $params, false);
+        return $this->request('GET', 'hive/overclocks', $params, false);
     }
 
     /**
      * Get Hive statistics
-     * @return HiveOsResponse
+     * 
+     * @return @return KriosMane\HiveOs\HiveResponse
      */
     public function hiveStats()
     {
-        return $this->_call('GET', 'hive/stats', [], false);
+        return $this->request('GET', 'hive/stats', [], false);
     }
 
     /**
      * List of supported exchanges
-     * @return HiveOsResponse
+     * 
+     * @return @return KriosMane\HiveOs\HiveResponse
      */
     public function exchanges()
     {
-        return $this->_call('GET', 'hive/exchanges', [], false);
+        return $this->request('GET', 'hive/exchanges', [], false);
+    }
+
+    /**
+     * Get last response object
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 
 }

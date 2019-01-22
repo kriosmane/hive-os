@@ -1,9 +1,9 @@
 <?php
 
-namespace KriosMane\HiveOs\app\Providers;
+namespace KriosMane\HiveOs\Providers;
 
 
-use KriosMane\HiveOs\app\HiveOs;
+use KriosMane\HiveOs\HiveOs;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -25,7 +25,7 @@ class HiveOsServiceProvider extends ServiceProvider
     public function boot()
     {   
 
-        $config = realpath(__DIR__.'/../../config/hiveos.php');
+        $config = realpath(__DIR__.'/../config/hiveos.php');
 
         $this->publishes([
 

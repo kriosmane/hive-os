@@ -1,6 +1,6 @@
 <?php
 
-namespace KriosMane\HiveOs\app\Facades;
+namespace KriosMane\HiveOs\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
