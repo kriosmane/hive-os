@@ -35,7 +35,7 @@ Also, register the Facade like so:
 You can publish the configuration file using this command:
 
 ```bash
-php artisan vendor:publish --provider="KriosMane\HiveOs\app\Providers\HiveOsServiceProvider"
+php artisan vendor:publish --provider="KriosMane\HiveOs\Providers\HiveOsServiceProvider"
 ```
 
 A configuration-file named `hiveos.php` with default settings will be placed in your `config` directory:
