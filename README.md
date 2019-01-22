@@ -51,9 +51,9 @@ https://the.hiveos.farm/login
 Open your .env file and add the following in this format. Ensure you must have gotten your api key:
 
 ```php
-HIVEOS_LOGIN=johndoe
-HIVEOS_PASSWORD=password
-HIVEOS_ACCESS_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ91e123asdas
+HIVEOS_LOGIN=****
+HIVEOS_PASSWORD=*****
+HIVEOS_ACCESS_TOKEN=***********************************************
 ```
 
 Add the following line to your controller
