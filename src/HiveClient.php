@@ -45,7 +45,7 @@ class HiveClient {
     /**
      * @var array
      */
-    protected $http_headers = [];
+    protected $headers = [];
 
     /**
      * @var string
