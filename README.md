@@ -1,5 +1,5 @@
-# Laravel HiveOS Api
-Laravel package for interacting with Hive OS api
+# HIVEOS API
+Package for interacting with Hive OS api
 
 ## Installation
 
@@ -10,6 +10,17 @@ To get the latest version of HiveOs api, simply run the code below in your proje
 ```
 composer require krios-mane/hive-os
 ```
+## Initial Setup
+
+#### Standalone 
+The first​ step is to initialize the library. Once you do that, You'll get access to all the available API Methods to make requests to HiveOs.
+```php
+use KriosMane\HiveOs\HiveOs;
+
+$hiveOs = new HiveOs('ACCESS_TOKEN');
+
+```
+#### Laravel
 Once Laravel HiveOs is installed, You need to register the service provider. Open up `config/app.php` and add the following to the `providers` key.
 
 ```php
@@ -29,9 +40,6 @@ Also, register the Facade like so:
     ...
 ]
 ```
-
-## Configuration
-
 You can publish the configuration file using this command:
 
 ```bash
@@ -45,8 +53,6 @@ You can visit this link to get your HiveOS api
 ```
 https://the.hiveos.farm/login
 ```
-
-## Usage
 
 Open your .env file and add the following in this format. Ensure you must have gotten your api key:
 
