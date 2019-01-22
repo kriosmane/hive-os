@@ -12,6 +12,8 @@ composer require kriosmane/hive-os
 ```
 ## Initial Setup
 
+Before proceding visit this [link](https://the.hiveos.farm/login) to get your HiveOS Api access token
+
 #### Standalone 
 The first​ step is to initialize the library. Once you do that, You'll get access to all the available API Methods to make requests to HiveOs.
 ```php
@@ -46,13 +48,7 @@ You can publish the configuration file using this command:
 php artisan vendor:publish --provider="KriosMane\HiveOs\Providers\HiveOs\ServiceProvider"
 ```
 
-A configuration-file named `hiveos.php` with default settings will be placed in your `config` directory:
-
-You can visit this link to get your HiveOS api
-
-```
-https://the.hiveos.farm/login
-```
+A configuration-file named `hiveos.php` with default settings will be placed in your `config` directory
 
 Open your .env file and add the following in this format. Ensure you must have gotten your api key:
 
