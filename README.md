@@ -8,7 +8,7 @@ Package for interacting with Hive OS api
 To get the latest version of HiveOs api, simply run the code below in your project.
 
 ```
-composer require krios-mane/hive-os
+composer require kriosmane/hive-os
 ```
 ## Initial Setup
 
