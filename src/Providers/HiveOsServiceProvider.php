@@ -13,9 +13,9 @@ class HiveOsServiceProvider extends ServiceProvider
     /*
     * Indicates if loading of the provider is deferred.
     *
-    * @var bool
+    * @var boolean
     */
-    protected $defer = false;
+    protected $defer = true;
 
     /**
      * Bootstrap services.
@@ -44,13 +44,16 @@ class HiveOsServiceProvider extends ServiceProvider
 
         $this->app->singleton('hive-os', function() {
 
-            return new HiveOs();
+            $access_token = config('hiveos.access_token');
+
+            return new HiveOs($access_token);
             
         });
     }
 
     /**
     * Get the services provided by the provider
+    *
     * @return array
     */
     public function provides()

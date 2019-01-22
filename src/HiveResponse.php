@@ -123,7 +123,7 @@ class HiveResponse {
     }
 
     /**
-     * 
+     * @return array 
      */
     public function getDecodedBody()
     {

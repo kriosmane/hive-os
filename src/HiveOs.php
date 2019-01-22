@@ -3,13 +3,12 @@
 namespace KriosMane\HiveOs;
 
 use KriosMane\HiveOs\HiveClient;
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 
 /**
- * 
+ * Class HiveOs
  */
 class HiveOs {
 
@@ -51,10 +50,14 @@ class HiveOs {
 
     /**
      * 
+     * @param string $access_token
+     * 
      */
-    public function __construct() {
+    public function __construct($access_token = '') {
 
-        $this->_init();
+        $this->setAccessToken($access_token);
+
+        $this->client = new HiveClient($this->access_token);
 
     }
 
@@ -108,6 +111,7 @@ class HiveOs {
 
     /**
      * Get user access token
+     * 
      * @return string $access_token
      */
     public function getAccessToken()
@@ -117,7 +121,9 @@ class HiveOs {
 
     /**
      * Set api's endpoint
+     * 
      * @param string $endpoint
+     * 
      * @return void
      */
     public function setEndPoint($endpoint)
@@ -127,6 +133,7 @@ class HiveOs {
 
     /**
      * Get api's endpoint
+     * 
      * @return string $endpoint
      */
     public function getEndPoint()
@@ -136,6 +143,7 @@ class HiveOs {
 
     /**
      * @param boolean $boolean
+     * 
      * @return void
      */
     public function setDebug($boolean)
@@ -144,7 +152,7 @@ class HiveOs {
     }
 
     /**
-     * 
+     * @return boolean
      */
     public function getDebug()
     {
@@ -153,6 +161,7 @@ class HiveOs {
 
     /**
      * @param boolean $boolean
+     * 
      * @return void
      */
     public function setVerify($boolean)
@@ -161,33 +170,11 @@ class HiveOs {
     }
 
     /**
-     * 
+     * @return boolean
      */
     public function getVerify()
     {
         return $this->verify;
-    }
-
-    /**
-     * Initialize class's attributes
-     * @return void
-     */
-    private function _init()
-    {
-
-        $this->login        = config('hiveos.login');
-        
-        $this->password     = config('hiveos.password');
-        
-        $this->access_token = config('hiveos.access_token');
-        
-        $this->client = new HiveClient($this->access_token);
-
-        if( $this->access_token == '' ){
-            
-            $this->authLogin();
-
-        }
     }
 
     /**
@@ -215,6 +202,7 @@ class HiveOs {
 
     /**
      *  generic call for debug purpose
+     * 
      * @param string  $method   The HTTP method for this request GET|POST|PUT|DELETE|PATCH
      * @param string  $endpoint The API endpoint for this request
      * @param array   $params   The parameters to send with this request
@@ -229,15 +217,24 @@ class HiveOs {
 
     /**
      * Create auth token (sign in)
+     * 
+     * @param string $login
+     * @param string $password
+     * 
      * @return boolean
      */
-    public function authLogin()
+    public function authLogin( $login, $password )
     {
+
+        $this->setLogin($login);
+
+        $this->setPassword($password);
+
         $params = [
 
-            'login' => $this->login,
+            'login' => $this->getLogin(),
 
-            'password' => $this->password
+            'password' => $this->getPassword()
         ];
 
         $response = $this->request('POST', 'auth/login', $params, false);
@@ -482,9 +479,9 @@ class HiveOs {
     /**
      * Transfer multiple workers to another farm
      * 
-     * @param int $farm_id
+     * @param int   $farm_id
      * @param array $workers_id
-     * @param int $target_farm_id
+     * @param int   $target_farm_id
      * 
      * @return KriosMane\HiveOs\HiveResponse
      */
@@ -506,7 +503,7 @@ class HiveOs {
     /**
      * Get miner log
      * 
-     * @param int $farm_id
+     * @param int    $farm_id
      * @param string $workers_id
      * 
      * @return KriosMane\HiveOs\HiveResponse
@@ -552,6 +549,7 @@ class HiveOs {
 
     /**
      * Worker metrics
+     * 
      * @param int $farm_id
      * @param int $worker_id
      * 
@@ -564,7 +562,8 @@ class HiveOs {
 
     /**
      * Farm workers GPU LIST
-     * @param int $farm_id
+     * 
+     * @param int   $farm_id
      * @param array $workers_id
      * 
      * @return KriosMane\HiveOs\HiveResponse
@@ -623,7 +622,7 @@ class HiveOs {
     /**
      * Create new flight sheet
      * 
-     * @param int $farm_id
+     * @param int   $farm_id
      * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
@@ -649,8 +648,8 @@ class HiveOs {
     /**
      * Edit flight sheet
      * 
-     * @param int $farm_id
-     * @param int $fs_id
+     * @param int   $farm_id
+     * @param int   $fs_id
      * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
@@ -708,7 +707,7 @@ class HiveOs {
     /**
      * Create new wallet
      * 
-     * @param int $farm_id
+     * @param int   $farm_id
      * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
@@ -721,8 +720,8 @@ class HiveOs {
     /**
      * Edit Wallet
      * 
-     * @param int $farm_id
-     * @param int $wallet_id
+     * @param int   $farm_id
+     * @param int   $wallet_id
      * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
