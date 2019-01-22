@@ -1,5 +1,7 @@
-# HIVEOS API
-Package for interacting with Hive OS api
+# HIVE OS API
+PHP Package for interacting with Hive OS a cryptocurrency operating system
+
+More details on [Hive Os](https://hiveos.farm/)
 
 ## Installation
 
@@ -19,7 +21,7 @@ The first​ step is to initialize the library. Once you do that, You'll get acc
 ```php
 use KriosMane\HiveOs\HiveOs;
 
-$access_token='**********************';
+$access_token = '**********************';
 $hiveOs = new HiveOs($access_token);
 
 ```
