@@ -19,7 +19,8 @@ The first​ step is to initialize the library. Once you do that, You'll get acc
 ```php
 use KriosMane\HiveOs\HiveOs;
 
-$hiveOs = new HiveOs('ACCESS_TOKEN');
+$access_token='**********************';
+$hiveOs = new HiveOs($access_token);
 
 ```
 #### Laravel
