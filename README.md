@@ -1,7 +1,7 @@
 # HIVE OS API
 PHP Package for interacting with Hive OS a cryptocurrency operating system
 
-More details on [Hive Os](https://hiveos.farm/)
+More details about [Hive Os](https://hiveos.farm/)
 
 ## Installation
 
