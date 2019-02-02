@@ -1,7 +1,7 @@
 {
     "name": "kriosmane/hive-os",
-    "description": "Laravel package for interacting with Hive OS api",
-    "keywords": ["hiveos", "laravel", "hiveos api", "php", "library", "cryptocurrency", "blockchain", "hive"],
+    "description": "PHP Package for interacting with Hive OS a cryptocurrency operating system",
+    "keywords": ["hiveos", "laravel", "hiveos api", "php", "library", "cryptocurrency", "blockchain", "hive", "crypto", "os"],
     "type": "library",
     "homepage": "https://github.com/kriosmane/hive-os",
     "license": "BSD-3-Clause",
