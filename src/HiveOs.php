@@ -351,9 +351,9 @@ class HiveOs {
      * 
      * @return KriosMane\HiveOs\HiveResponse
      */
-    public function getWorkers($farm_id)
+    public function getWorkers($farm_id, $params = [])
     {
-        return $this->request('GET', 'farms/'.$farm_id.'/workers');
+        return $this->request('GET', 'farms/'.$farm_id.'/workers', $params);
     }
 
     /**
