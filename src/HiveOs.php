@@ -312,42 +312,46 @@ class HiveOs {
      * Farm's statistics
      * 
      * @param int $farm_id
+     * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
      */
-    public function getFarmStats($farm_id)
+    public function getFarmStats($farm_id, $params = [])
     {
-        return $this->request('GET', 'farms/'.$farm_id.'/stats');
+        return $this->request('GET', 'farms/'.$farm_id.'/stats', $params);
     }
 
     /**
      * Farm's metrics
      * 
      * @param int $farm_id
+     * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
      */
-    public function getFarmMetrics($farm_id)
+    public function getFarmMetrics($farm_id, $params = [])
     {
-        return $this->request('GET', 'farms/'.$farm_id.'/metrics');
+        return $this->request('GET', 'farms/'.$farm_id.'/metrics', $params);
     }
 
     /**
      * Farm events
      * 
      * @param int $farm_id Farm ID
+     * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
      */
-    public function events($farm_id)
+    public function events($farm_id, $params = [])
     {
-        return $this->request('GET', 'farms/'.$farm_id.'/events');
+        return $this->request('GET', 'farms/'.$farm_id.'/events', $params);
     }
 
     /**
      * List farm's workers
      * 
      * @param integer $farm_id
+     * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
      */
@@ -525,12 +529,13 @@ class HiveOs {
      * 
      * @param int $farm_id
      * @param int $worker_id 
+     * @param array $params
      *  
      * @return KriosMane\HiveOs\HiveResponse
      */
-    public function getWorkerMessages($farm_id, $worker_id)
+    public function getWorkerMessages($farm_id, $worker_id, $params = [])
     {
-        return $this->request('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/messages');
+        return $this->request('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/messages', $params);
     }
 
     /**
@@ -552,12 +557,13 @@ class HiveOs {
      * 
      * @param int $farm_id
      * @param int $worker_id
+     * @param array $params
      * 
      * @return KriosMane\HiveOs\HiveResponse
      */
-    public function getWorkerMetrics($farm_id, $worker_id)
+    public function getWorkerMetrics($farm_id, $worker_id, $params = [])
     {
-        return $this->request('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/metrics');
+        return $this->request('GET', 'farms/'.$farm_id.'/workers/'.$worker_id.'/metrics', $params);
     }
 
     /**
@@ -835,12 +841,13 @@ class HiveOs {
      * Returns tags that belong to given farm along with tags that belong to farm’s owner
      * 
      * @param int $farm_id
+     * @param array $params
      * 
      * @return @return KriosMane\HiveOs\HiveResponse
      */
-    public function tags($farm_id)
+    public function tags($farm_id, $params = [])
     {
-        return $this->request('GET', 'farms/'.$farm_id.'/tags');
+        return $this->request('GET', 'farms/'.$farm_id.'/tags', $params);
     }
 
     /**
