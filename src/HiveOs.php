@@ -553,6 +553,20 @@ class HiveOs {
     }
 
     /**
+     * Delete all worker messages
+     * 
+     * @param int $farm_id
+     * @param int $worker_id
+     * @param int $message_id
+     * 
+     * @return KriosMane\HiveOs\HiveResponse
+     */
+    public function deleteWorkerMessages($farm_id, $worker_id)
+    {
+        return $this->request('DELETE', 'farms/'.$farm_id.'/workers/'.$worker_id.'/messages');
+    }
+
+    /**
      * Worker metrics
      * 
      * @param int $farm_id
