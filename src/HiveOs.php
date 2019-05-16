@@ -305,7 +305,7 @@ class HiveOs {
      */
     public function deleteFarm($farm_id)
     {
-
+        return $this->request('DELETE', 'farms/'.$farm_id);
     }
 
     /**
