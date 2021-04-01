@@ -5,7 +5,7 @@ More details about [Hive Os](https://hiveos.farm/)
 
 ## Installation
 
-[PHP](https://php.net) 7.1+ and [Composer](https://getcomposer.org) are required.
+[PHP](https://php.net) 7.3+ and [Composer](https://getcomposer.org) are required.
 
 To get the latest version of HiveOs api, simply run the code below in your project.
 
