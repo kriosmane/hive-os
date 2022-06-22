@@ -288,7 +288,7 @@ class HiveClient {
 
             case 'PATCH':
 
-                $option = 'form_params';
+                $option = 'json';
 
                 break;
         }
