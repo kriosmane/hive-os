@@ -1,3 +1,5 @@
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kriosmane/hive-os.svg?style=flat-square)](https://packagist.org/packages/kriosmane/hive-os)
+[![Total Downloads](https://img.shields.io/packagist/dt/kriosmane/hive-os.svg?style=flat-square)](https://packagist.org/packages/kriosmane/hive-os)
 # HIVE OS API
 PHP Package for interacting with Hive OS a cryptocurrency operating system
 
